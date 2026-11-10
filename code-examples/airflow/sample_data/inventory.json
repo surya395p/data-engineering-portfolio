@@ -1,0 +1,20 @@
+[
+  {
+    "sku": "SKU-100",
+    "location_id": "LOC-01",
+    "quantity": 24,
+    "source_updated_at": "2026-11-09T08:30:00Z"
+  },
+  {
+    "sku": "SKU-200",
+    "location_id": "LOC-01",
+    "quantity": 0,
+    "source_updated_at": "2026-11-09T08:35:00Z"
+  },
+  {
+    "sku": "SKU-300",
+    "location_id": "LOC-02",
+    "quantity": 7,
+    "source_updated_at": "2026-11-09T08:40:00Z"
+  }
+]

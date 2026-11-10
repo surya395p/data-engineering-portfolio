@@ -34,7 +34,13 @@ A collection of production-inspired data engineering workflow descriptions and i
 │   ├── 02-soap-api-inventory-pipeline/
 │   └── 03-paginated-api-inventory-pipeline/
 └── code-examples/
-    ├── airflow/README.md
+    ├── airflow/
+    │   ├── dags/
+    │   │   ├── inventory_ingestion.py
+    │   │   └── inventory_pipeline.py
+    │   ├── sample_data/inventory.json
+    │   ├── tests/test_inventory_pipeline.py
+    │   └── README.md
     ├── python/validation.py
     └── sql/inventory_upsert.sql
 ```
@@ -43,6 +49,6 @@ A collection of production-inspired data engineering workflow descriptions and i
 
 Python, SQL, Apache Airflow, Google Cloud Storage, BigQuery, PostgreSQL, REST/SOAP APIs, OAuth 2.0, XML/CSV/delimited files, data quality, orchestration, CI/CD, logging, and alerting.
 
-Start with the project pages for architecture and workflow context, then review the independent [Python validation example](code-examples/python/validation.py) and [SQL upsert example](code-examples/sql/inventory_upsert.sql).
+Start with the project pages for architecture and workflow context, then review the independent [Python validation example](code-examples/python/validation.py), [SQL upsert example](code-examples/sql/inventory_upsert.sql), and [runnable Airflow inventory DAG](code-examples/airflow/README.md).
 
 *Portfolio documentation and demonstration code. Sample data is synthetic.*
