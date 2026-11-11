@@ -3,6 +3,7 @@
 import sqlite3
 import tempfile
 import unittest
+from contextlib import closing
 from pathlib import Path
 
 from inventory_pipeline import read_inventory, upsert_inventory, validate_inventory
@@ -57,7 +58,7 @@ class InventoryUpsertTests(unittest.TestCase):
         self.temp_dir.cleanup()
 
     def fetch_rows(self):
-        with sqlite3.connect(self.database) as connection:
+        with closing(sqlite3.connect(self.database)) as connection:
             return connection.execute(
                 "SELECT sku, location_id, quantity, source_updated_at FROM inventory_current"
             ).fetchall()

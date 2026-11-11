@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import logging
 import sqlite3
+from contextlib import closing
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
@@ -91,30 +92,31 @@ def upsert_inventory(records: Iterable[dict[str, Any]], database_path: str | Pat
     target.parent.mkdir(parents=True, exist_ok=True)
     rows = list(records)
 
-    with sqlite3.connect(target) as connection:
-        connection.execute(
-            """CREATE TABLE IF NOT EXISTS inventory_current (
-                sku TEXT NOT NULL,
-                location_id TEXT NOT NULL,
-                quantity INTEGER NOT NULL CHECK (quantity >= 0),
-                source_updated_at TEXT NOT NULL,
-                PRIMARY KEY (sku, location_id)
-            )"""
-        )
-        before = connection.total_changes
-        connection.executemany(
-            """INSERT INTO inventory_current
-                   (sku, location_id, quantity, source_updated_at)
-               VALUES (:sku, :location_id, :quantity, :source_updated_at)
-               ON CONFLICT (sku, location_id) DO UPDATE SET
-                   quantity = excluded.quantity,
-                   source_updated_at = excluded.source_updated_at
-               WHERE excluded.source_updated_at > inventory_current.source_updated_at
-                  OR (excluded.source_updated_at = inventory_current.source_updated_at
-                      AND excluded.quantity != inventory_current.quantity)""",
-            rows,
-        )
-        changed = connection.total_changes - before
+    with closing(sqlite3.connect(target)) as connection:
+        with connection:
+            connection.execute(
+                """CREATE TABLE IF NOT EXISTS inventory_current (
+                    sku TEXT NOT NULL,
+                    location_id TEXT NOT NULL,
+                    quantity INTEGER NOT NULL CHECK (quantity >= 0),
+                    source_updated_at TEXT NOT NULL,
+                    PRIMARY KEY (sku, location_id)
+                )"""
+            )
+            before = connection.total_changes
+            connection.executemany(
+                """INSERT INTO inventory_current
+                       (sku, location_id, quantity, source_updated_at)
+                   VALUES (:sku, :location_id, :quantity, :source_updated_at)
+                   ON CONFLICT (sku, location_id) DO UPDATE SET
+                       quantity = excluded.quantity,
+                       source_updated_at = excluded.source_updated_at
+                   WHERE excluded.source_updated_at > inventory_current.source_updated_at
+                      OR (excluded.source_updated_at = inventory_current.source_updated_at
+                          AND excluded.quantity != inventory_current.quantity)""",
+                rows,
+            )
+            changed = connection.total_changes - before
 
     LOGGER.info("Applied %d input records; %d rows inserted or updated", len(rows), changed)
     return changed
